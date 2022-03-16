@@ -75,25 +75,40 @@ class AVL:
         y.height = 1 + self.maximum(self.height(y.left), self.height(y.right))
 
     def search(self, x, rootNode=None):                         #funkcia na vyhladavanie hodnoty v avl strome
+
+        #if rootNode is None:
+            #rootNode = self.root
         
-        if rootNode is None:
-            rootNode = self.root
+        #if x == rootNode.hodnota:                           
+            #return rootNode
+        #elif(x<rootNode.hodnota):
+            #return self.search(x, rootNode.left)
+        #elif(x>rootNode.hodnota):
+            #return self.search(x, rootNode.right)
+        #else:
+            #return None
         
-        if x == rootNode.hodnota:                           
-            return rootNode
-        elif(x<rootNode.hodnota):
-            return self.search(x, rootNode.left)
-        elif(x>rootNode.hodnota):
-            return self.search(x, rootNode.right)
-        else:
-            return None
+        actualNode = self.root
+        while True:
+            if actualNode is None:
+                return False
+            
+            if actualNode.hodnota == x:
+                return True
+            
+            if x < actualNode.hodnota:
+                actualNode = actualNode.left
+            else:
+                actualNode = actualNode.right
+
 
     def insert(self, n, rootNode):
         newNode = Node(n)
-    
+
         if rootNode is None:
             rootNode = newNode
             return rootNode
+            
         elif(n < rootNode.hodnota):
             rootNode.left = self.insert(n, rootNode.left)
             return rootNode
@@ -103,7 +118,7 @@ class AVL:
 
         newNode.height += self.maximum(self.height(newNode.left), self.height(newNode.right))
 
-        balanceFaktor = self.balance(self.root)             #updatneme balance faktor
+        balanceFaktor = self.balance(newNode)             #updatneme balance faktor
                                                              #ak su nody nevybalancovane , tak ich vybalancujeme  
         if(balanceFaktor > 1):                              #ak je BF vacsi ako 1, znamena to ze vyska laveho substromu je vacsia ako praveho substromu 
             if(newNode<newNode.left.hodnota):                           #ak je nova noda mensia ako hodnota laveho childu, pouzijeme rotaciu vpravo
@@ -117,7 +132,9 @@ class AVL:
             else:                                           #inak pouzijeme right-left rotaciu
                 newNode.right = self.rotacia_vpravo(newNode.right)
                 return self.rotacia_vlavo(newNode)
-        return newNode
+
+        self.root = rootNode
+        return rootNode
 
     def delete(self, n, value):
         if(n is None):
@@ -188,7 +205,7 @@ class AVL:
 #---------------------TESTOVAC--------------------------------
 #treba napriklad vlozit 100 000 a potom z toho napriklad 50k vymazat atd atd
 
-velkost_prvkov = 1000000
+velkost_prvkov = 10000
 hodnoty = []
 
 def naplnenie_hodnot(velkost):
@@ -205,9 +222,9 @@ print("Pocet testovacich prvkov: ",velkost_prvkov)
 
 time1 = time.time()
 
-a=None
-for i in range(velkost_prvkov):
-    Node(hodnoty[i])
+a=Node(hodnoty[0])
+for i in range(1, velkost_prvkov):
+    # Node(hodnoty[i])
     a = Tree.insert(hodnoty[i], a)
 
 time2 = time.time()
@@ -215,15 +232,19 @@ print("Strom uspesne insertoval prvky za cas: ", time2-time1)
 
 #testovac na search
 
-#time1 = time.time()
+time1 = time.time()
 
-#b=None
-#for j in range(velkost_prvkov):
-    #Node(hodnoty[j])
-    #b = Tree.search(hodnoty[j], b)
+Tree.root = a
+b=None
+cnt = 0
+for j in range(velkost_prvkov):
+    # b = Node(hodnoty[j])
+    if Tree.search(hodnoty[j]):
+        cnt += 1
 
-#time2=time.time()
+time2=time.time()
 print("Strom uspesne vyhladal prvky v case: ",time2-time1)
+print(f"Uspesne najdenia: {cnt}")
 
 #testovac na delete
 
